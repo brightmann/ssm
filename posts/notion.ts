@@ -61,6 +61,10 @@ export const POSTS = {
     date: new Date('2026-10-25').toDateString(),
     uri: '40463c580eea809da39fe2aa8088c6fe',
   },
+   'ce': {
+    date: new Date('2026-10-25').toDateString(),
+    uri: '40463c580eea80558cfdcde1301ee572',
+  },
 };
 
 export interface PageInfo {
