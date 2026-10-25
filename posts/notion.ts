@@ -57,6 +57,10 @@ export const POSTS = {
     date: new Date('2021-07-06').toDateString(),
     uri: 'shblog/Rapid-UI-development-with-styled-system-e1ce2f8a2e64485491b49e4e3a6a8f96',
   },
+  'test': {
+    date: new Date('2026-10-25').toDateString(),
+    uri: '40463c580eea809da39fe2aa8088c6fe',
+  },
 };
 
 export interface PageInfo {
