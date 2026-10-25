@@ -1,6 +1,5 @@
 import Head from 'next/head';
-import styled from 'styled-components';
-import { Title, Link, Container, Grid, Card, Image, Text } from '@components';
+import { Title, Link, Container, Grid, Card, Text } from '@components';
 import { Page } from '@posts/notion';
 import BlogPagination from './BlogPagination';
 
@@ -9,10 +8,6 @@ export interface BlogPageProps {
   currentPage: number;
   totalPages: number;
 }
-
-const BlogImage = styled(Image)`
-  border-radius: 5px;
-`;
 
 // Shared by /blog (page 1) and /blog/page/[page] so every listing page
 // renders the same header, grid, and pager.
@@ -34,7 +29,7 @@ const BlogPage = ({ pages, currentPage, totalPages }: BlogPageProps) => {
         </Text>
       </Container>
       <Grid gridTemplateColumns={['1fr', '1fr 1fr']} gridGap={['3rem', '2rem']}>
-        {pages.map(({ title, uri, date, cover }, i) => (
+        {pages.map(({ title, uri, date }, i) => (
           <Link key={i} href={uri}>
             <Card padding={[0]} margin={[0]}>
               <Grid
@@ -42,14 +37,6 @@ const BlogPage = ({ pages, currentPage, totalPages }: BlogPageProps) => {
                 justifyItems={['center', 'flex-start']}
                 gridGap="1rem"
               >
-                {cover && (
-                  <BlogImage
-                    src={cover}
-                    width="100%"
-                    height="auto"
-                    alt={title}
-                  />
-                )}
                 <Container
                   gridGap=".5rem"
                   alignItems={['center', 'flex-start']}
