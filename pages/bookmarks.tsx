@@ -1,6 +1,6 @@
 import React from 'react';
 import Head from 'next/head';
-import { GetStaticProps, InferGetStaticPropsType } from 'next';
+import { InferGetStaticPropsType } from 'next';
 import Image from 'next/image';
 import TimeAgo from 'javascript-time-ago';
 import { Title, Container, Text, Grid, Link, Card } from '@components';
@@ -119,7 +119,10 @@ const formatBookmarks = ({
 // available at build time. Render them at build time instead, and degrade
 // to an empty list when the Notion query fails (no token / no access),
 // so one private data source can never break the whole site.
-export const getStaticProps: GetStaticProps = async () => {
+// Unannotated on purpose, like the original getServerSideProps: the bare
+// GetStaticProps annotation erases the props type, and the component's
+// destructured bookmark fields then fail with implicit-any errors.
+export const getStaticProps = async () => {
   try {
     const bookmarks = await getBookmarks();
     return {
