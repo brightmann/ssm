@@ -44,6 +44,30 @@ export const normalizeRecordMap = (
   return recordMap;
 };
 
+// Fetch a page with its FULL block list. notion-client's getPage only
+// fetches missing blocks for ids it can see in the first chunk's content
+// arrays — but with Notion's double-wrapped records those arrays are
+// invisible until normalized, so the fetch loop exits immediately and any
+// page longer than one chunk (~100 blocks) renders truncated. Normalizing
+// the raw chunk inside getPageRaw, before getPage's own fetch loop runs,
+// lets it discover and fetch every block. The post-hoc normalizeRecordMap
+// call in the pages stays as a second layer for blocks fetched via
+// syncRecordValues, which arrive double-wrapped too.
+export const getNotionPage = async (uri: string) => {
+  const { NotionAPI } = await import('notion-client');
+  const api = new NotionAPI();
+  const origGetPageRaw = api.getPageRaw.bind(api);
+  (api as unknown as { getPageRaw: typeof api.getPageRaw }).getPageRaw =
+    (async (...args: Parameters<typeof api.getPageRaw>) => {
+      const res = await origGetPageRaw(...args);
+      if (res && res.recordMap) {
+        normalizeRecordMap(res.recordMap as ExtendedRecordMap);
+      }
+      return res;
+    }) as typeof api.getPageRaw;
+  return api.getPage(uri, { gotOptions: notionGotOptions });
+};
+
 export const POSTS = {
   'go-graphql-api': {
     date: new Date('2021-06-25').toDateString(),

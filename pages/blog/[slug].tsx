@@ -2,12 +2,11 @@ import Head from 'next/head';
 import dynamic from 'next/dynamic';
 import { GetStaticPaths, GetStaticPropsResult, NextPage } from 'next';
 import { NotionRenderer } from 'react-notion-x';
-import { NotionAPI } from 'notion-client';
 
 import {
+  getNotionPage,
   getPageInfo,
   normalizeRecordMap,
-  notionGotOptions,
   Page,
   POSTS,
 } from '@posts/notion';
@@ -61,15 +60,12 @@ type Params = {
   };
 };
 
-const notion = new NotionAPI();
 
 export const getStaticProps = async ({
   params: { slug },
 }: Params): Promise<GetStaticPropsResult<BlogProps>> => {
   const { uri, date } = POSTS[slug];
-  const recordMap = normalizeRecordMap(
-    await notion.getPage(uri, { gotOptions: notionGotOptions }),
-  );
+  const recordMap = normalizeRecordMap(await getNotionPage(uri));
   const pageInfo = getPageInfo(recordMap);
   const page: Page = {
     ...pageInfo,

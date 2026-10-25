@@ -1,12 +1,11 @@
 import Head from 'next/head';
 import styled from 'styled-components';
 import { GetStaticPropsResult, NextPage } from 'next';
-import { NotionAPI } from 'notion-client';
 
 import {
+  getNotionPage,
   getPageInfo,
   normalizeRecordMap,
-  notionGotOptions,
   Page,
   POSTS,
 } from '@posts/notion';
@@ -75,7 +74,6 @@ const Blog: NextPage<BlogProps> = ({ pages }) => {
   );
 };
 
-const notion = new NotionAPI();
 
 export const getStaticProps = async (): Promise<
   GetStaticPropsResult<BlogProps>
@@ -84,9 +82,7 @@ export const getStaticProps = async (): Promise<
   await Promise.all(
     Object.keys(POSTS).map(async (key) => {
       const { uri, date } = POSTS[key as keyof typeof POSTS];
-      const page = normalizeRecordMap(
-        await notion.getPage(uri, { gotOptions: notionGotOptions }),
-      );
+      const page = normalizeRecordMap(await getNotionPage(uri));
       if (page) {
         const info = getPageInfo(page);
         if (info.title !== 'Blog') {
