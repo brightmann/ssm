@@ -31,8 +31,11 @@ const pageItems = (current: number, total: number): (number | '…')[] => {
   if (total <= 7) {
     return Array.from({ length: total }, (_, i) => i + 1);
   }
-  const nums = [...new Set([1, total, current - 1, current, current + 1])]
+  // Dedupe manually: spreading a Set needs downlevelIteration, which
+  // this repo's TS target does not enable (Workers build caught this).
+  const nums = [1, total, current - 1, current, current + 1]
     .filter((n) => n >= 1 && n <= total)
+    .filter((n, i, arr) => arr.indexOf(n) === i)
     .sort((a, b) => a - b);
   const items: (number | '…')[] = [];
   let prev = 0;
