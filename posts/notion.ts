@@ -89,6 +89,10 @@ export const POSTS = {
     date: new Date('2026-10-25').toDateString(),
     uri: '40463c580eea80558cfdcde1301ee572',
   },
+   'song-sound': {
+    date: new Date('2026-10-25').toDateString(),
+    uri: '40463c580eea80dca122d5a71e1ddc4c',
+  },
 };
 
 export const POSTS_PER_PAGE = 5;
