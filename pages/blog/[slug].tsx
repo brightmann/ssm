@@ -4,7 +4,13 @@ import { GetStaticPaths, GetStaticPropsResult, NextPage } from 'next';
 import { NotionRenderer } from 'react-notion-x';
 import { NotionAPI } from 'notion-client';
 
-import { getPageInfo, Page, POSTS } from '@posts/notion';
+import {
+  getPageInfo,
+  normalizeRecordMap,
+  notionGotOptions,
+  Page,
+  POSTS,
+} from '@posts/notion';
 import { Container, Text } from '@components';
 import { ComponentProps } from 'react';
 
@@ -61,7 +67,9 @@ export const getStaticProps = async ({
   params: { slug },
 }: Params): Promise<GetStaticPropsResult<BlogProps>> => {
   const { uri, date } = POSTS[slug];
-  const recordMap = await notion.getPage(uri);
+  const recordMap = normalizeRecordMap(
+    await notion.getPage(uri, { gotOptions: notionGotOptions }),
+  );
   const pageInfo = getPageInfo(recordMap);
   const page: Page = {
     ...pageInfo,

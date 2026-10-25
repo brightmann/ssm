@@ -1,6 +1,6 @@
 import React from 'react';
 import Head from 'next/head';
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { GetStaticProps, InferGetStaticPropsType } from 'next';
 import Image from 'next/image';
 import TimeAgo from 'javascript-time-ago';
 import { Title, Container, Text, Grid, Link, Card } from '@components';
@@ -14,7 +14,7 @@ const timeAgo = new TimeAgo('en-US');
 
 const Bookmarks = ({
   bookmarks,
-}: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element => (
+}: InferGetStaticPropsType<typeof getStaticProps>): JSX.Element => (
   <Container marginBottom="5rem">
     <Head>
       <title>Bookmarks</title>
@@ -114,21 +114,26 @@ const formatBookmarks = ({
     return acc;
   }, []);
 
-export const getServerSideProps = async ({
-  res,
-}: GetServerSidePropsContext) => {
-  const bookmarks = await getBookmarks();
-
-  res.setHeader(
-    'Cache-Control',
-    'public, s-maxage=3600, stale-while-revalidate=60',
-  );
-
-  return {
-    props: {
-      bookmarks: formatBookmarks(bookmarks),
-    },
-  };
+// Static export: bookmarks were server-rendered from the author's private
+// Notion database (NOTION_TOKEN + NOTION_BOOKMARKS_ID), which is not
+// available at build time. Render them at build time instead, and degrade
+// to an empty list when the Notion query fails (no token / no access),
+// so one private data source can never break the whole site.
+export const getStaticProps: GetStaticProps = async () => {
+  try {
+    const bookmarks = await getBookmarks();
+    return {
+      props: {
+        bookmarks: formatBookmarks(bookmarks),
+      },
+    };
+  } catch {
+    return {
+      props: {
+        bookmarks: [],
+      },
+    };
+  }
 };
 
 export default Bookmarks;

@@ -3,7 +3,13 @@ import styled from 'styled-components';
 import { GetStaticPropsResult, NextPage } from 'next';
 import { NotionAPI } from 'notion-client';
 
-import { getPageInfo, Page, POSTS } from '@posts/notion';
+import {
+  getPageInfo,
+  normalizeRecordMap,
+  notionGotOptions,
+  Page,
+  POSTS,
+} from '@posts/notion';
 import { Title, Link, Container, Grid, Card, Image, Text } from '@components';
 
 interface BlogProps {
@@ -78,7 +84,9 @@ export const getStaticProps = async (): Promise<
   await Promise.all(
     Object.keys(POSTS).map(async (key) => {
       const { uri, date } = POSTS[key as keyof typeof POSTS];
-      const page = await notion.getPage(uri);
+      const page = normalizeRecordMap(
+        await notion.getPage(uri, { gotOptions: notionGotOptions }),
+      );
       if (page) {
         const info = getPageInfo(page);
         if (info.title !== 'Blog') {
