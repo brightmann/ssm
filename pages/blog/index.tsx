@@ -78,18 +78,24 @@ const Blog: NextPage<BlogProps> = ({ pages }) => {
 export const getStaticProps = async (): Promise<
   GetStaticPropsResult<BlogProps>
 > => {
-  const pages: Page[] = [];
+  // Entries carry their POSTS position so same-day posts have a
+  // deterministic order: a post added later to POSTS is the newer post
+  // and sorts first when the day-granularity dates tie.
+  const entries: { page: Page; index: number }[] = [];
   await Promise.all(
-    Object.keys(POSTS).map(async (key) => {
+    Object.keys(POSTS).map(async (key, index) => {
       const { uri, date } = POSTS[key as keyof typeof POSTS];
       const page = normalizeRecordMap(await getNotionPage(uri));
       if (page) {
         const info = getPageInfo(page);
         if (info.title !== 'Blog') {
-          pages.push({
-            ...info,
-            date,
-            uri: `/blog/${key}`,
+          entries.push({
+            page: {
+              ...info,
+              date,
+              uri: `/blog/${key}`,
+            },
+            index,
           });
         }
       }
@@ -98,9 +104,13 @@ export const getStaticProps = async (): Promise<
 
   return {
     props: {
-      pages: pages.sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
-      ),
+      pages: entries
+        .sort(
+          (a, b) =>
+            new Date(b.page.date).getTime() -
+              new Date(a.page.date).getTime() || b.index - a.index,
+        )
+        .map((entry) => entry.page),
     },
   };
 };
