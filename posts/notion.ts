@@ -91,6 +91,42 @@ export const POSTS = {
   },
 };
 
+export const POSTS_PER_PAGE = 5;
+
+// All blog posts, newest first. Entries carry their POSTS position so
+// same-day posts have a deterministic order: a post added later to POSTS
+// is the newer post and sorts first when the day-granularity dates tie.
+// Shared by /blog and /blog/page/[page] so both list the same order.
+export const getBlogPages = async (): Promise<Page[]> => {
+  const entries: { page: Page; index: number }[] = [];
+  await Promise.all(
+    Object.keys(POSTS).map(async (key, index) => {
+      const { uri, date } = POSTS[key as keyof typeof POSTS];
+      const page = normalizeRecordMap(await getNotionPage(uri));
+      if (page) {
+        const info = getPageInfo(page);
+        if (info.title !== 'Blog') {
+          entries.push({
+            page: {
+              ...info,
+              date,
+              uri: `/blog/${key}`,
+            },
+            index,
+          });
+        }
+      }
+    }),
+  );
+  return entries
+    .sort(
+      (a, b) =>
+        new Date(b.page.date).getTime() - new Date(a.page.date).getTime() ||
+        b.index - a.index,
+    )
+    .map((entry) => entry.page);
+};
+
 export interface PageInfo {
   title: string;
   cover?: string;
