@@ -101,6 +101,10 @@ export const POSTS = {
     date: new Date('2026-10-25').toDateString(),
     uri: '40463c580eea8002a233f35f24c40b44',
   },
+  'naxi-lovesong': {
+    date: new Date('2026-10-25').toDateString(),
+    uri: '40463c580eea80de8418e1e506469dcf',
+  },
 };
 
 export const POSTS_PER_PAGE = 5;
