@@ -105,6 +105,10 @@ export const POSTS = {
     date: new Date('2026-10-25').toDateString(),
     uri: '40463c580eea80de8418e1e506469dcf',
   },
+    'advice': {
+    date: new Date('2026-10-28').toDateString(),
+    uri: '40663c580eea8090ba32f867fbe91bb1',
+  },
 };
 
 export const POSTS_PER_PAGE = 5;
